@@ -66,15 +66,15 @@ for k = 1:length(theta2_vals)
              R2*sin(theta2) + R23*sin(theta23) - R14*sin(theta14) - R1*sin(theta1);
              R2*cos(theta2) + R4*cos(theta23) + R46*cos(theta46) - R36*cos(theta36) - R3*cos(theta14+alpha) - R1*cos(theta1);
              R2*sin(theta2) + R4*sin(theta23) + R46*sin(theta46) - R36*sin(theta36) - R3*sin(theta14+alpha) - R1*sin(theta1);
-             R2*cos(theta2) + R4*cos(theta23) + R6*cos(theta46) + R8*cos(theta8) - R7*cos(theta7) - R5*cos(theta36+beta) - R3*cos(theta14+alpha) - R1*cos(theta1);
-             R2*sin(theta2) + R4*sin(theta23) + R6*sin(theta46) + R8*sin(theta8) - R7*sin(theta7) - R5*sin(theta36+beta) - R3*sin(theta14+alpha) - R1*sin(theta1)];
+             R2*cos(theta2) + R4*cos(theta23) + R6*cos(theta46) - R8*cos(theta8) + R7*cos(theta7) - R5*cos(theta36+beta) - R3*cos(theta14+alpha) - R1*cos(theta1);
+             R2*sin(theta2) + R4*sin(theta23) + R6*sin(theta46) - R8*sin(theta8) + R7*sin(theta7) - R5*sin(theta36+beta) - R3*sin(theta14+alpha) - R1*sin(theta1)];
 
         J = [-R23*sin(theta23),  R14*sin(theta14),              0,              0,             0,            0;
               R23*cos(theta23), -R14*cos(theta14),              0,              0,             0,            0;
              -R4*sin(theta23),   R3*sin(theta14+alpha), -R46*sin(theta46),  R36*sin(theta36),  0,            0;
               R4*cos(theta23),  -R3*cos(theta14+alpha),  R46*cos(theta46), -R36*cos(theta36),  0,            0;
-             -R4*sin(theta23),   R3*sin(theta14+alpha), -R6*sin(theta46),   R5*sin(theta36+beta), -R8*sin(theta8),  R7*sin(theta7);
-              R4*cos(theta23),  -R3*cos(theta14+alpha),  R6*cos(theta46),  -R5*cos(theta36+beta),  R8*cos(theta8), -R7*cos(theta7)];
+             -R4*sin(theta23),   R3*sin(theta14+alpha), -R6*sin(theta46),   R5*sin(theta36+beta),  R8*sin(theta8), -R7*sin(theta7);
+              R4*cos(theta23),  -R3*cos(theta14+alpha),  R6*cos(theta46),  -R5*cos(theta36+beta), -R8*cos(theta8),  R7*cos(theta7)];
 
         dx = J\f;
         x_new = x - dx;
@@ -124,8 +124,8 @@ for k = 1:length(theta2_vals)
                R2*sin(theta2)*omega2^2 + R23*sin(theta23)*w23^2 - R14*sin(theta14)*w14^2;
                R2*cos(theta2)*omega2^2 + R4*cos(theta23)*w23^2 + R46*cos(theta46)*w46^2 - R36*cos(theta36)*w36^2 - R3*cos(theta14+alpha)*w14^2;
                R2*sin(theta2)*omega2^2 + R4*sin(theta23)*w23^2 + R46*sin(theta46)*w46^2 - R36*sin(theta36)*w36^2 - R3*sin(theta14+alpha)*w14^2;
-               R2*cos(theta2)*omega2^2 + R4*cos(theta23)*w23^2 + R6*cos(theta46)*w46^2 + R8*cos(theta8)*w8^2 - R7*cos(theta7)*w7^2 - R5*cos(theta36+beta)*w36^2 - R3*cos(theta14+alpha)*w14^2;
-               R2*sin(theta2)*omega2^2 + R4*sin(theta23)*w23^2 + R6*sin(theta46)*w46^2 + R8*sin(theta8)*w8^2 - R7*sin(theta7)*w7^2 - R5*sin(theta36+beta)*w36^2 - R3*sin(theta14+alpha)*w14^2];
+               R2*cos(theta2)*omega2^2 + R4*cos(theta23)*w23^2 + R6*cos(theta46)*w46^2 - R8*cos(theta8)*w8^2 + R7*cos(theta7)*w7^2 - R5*cos(theta36+beta)*w36^2 - R3*cos(theta14+alpha)*w14^2;
+               R2*sin(theta2)*omega2^2 + R4*sin(theta23)*w23^2 + R6*sin(theta46)*w46^2 - R8*sin(theta8)*w8^2 + R7*sin(theta7)*w7^2 - R5*sin(theta36+beta)*w36^2 - R3*sin(theta14+alpha)*w14^2];
 
     alpha_vec = J \ rhs_acc;
 
@@ -170,3 +170,23 @@ legend('\alpha_3','\alpha_4','\alpha_5','\alpha_6','\alpha_7','\alpha_8','Locati
 grid on
 box on
 %exportgraphics(gcf, 'ENME_473_Project_4a_acceleration.png', 'Resolution', 600);
+
+%% Print tabular results - Angular Velocities
+fprintf('\n=== Angular Velocities (rad/s) ===\n');
+fprintf('%10s %10s %10s %10s %10s %10s %10s\n', ...
+    'Theta 2', 'omega3', 'omega4', 'omega5', 'omega6', 'omega7', 'omega8');
+for k = 1:length(in)
+    fprintf('%10d %10.4f %10.4f %10.4f %10.4f %10.4f %10.4f\n', ...
+        in(k), omega3_vals(k), omega4_vals(k), omega5_vals(k), ...
+        omega6_vals(k), omega7_vals(k), omega8_vals(k));
+end
+
+%% Print tabular results - Angular Accelerations
+fprintf('\n=== Angular Accelerations (rad/s^2) ===\n');
+fprintf('%10s %10s %10s %10s %10s %10s %10s\n', ...
+    'Theta 2', 'alpha3', 'alpha4', 'alpha5', 'alpha6', 'alpha7', 'alpha8');
+for k = 1:length(in)
+    fprintf('%10d %10.4f %10.4f %10.4f %10.4f %10.4f %10.4f\n', ...
+        in(k), alpha3_vals(k), alpha4_vals(k), alpha5_vals(k), ...
+        alpha6_vals(k), alpha7_vals(k), alpha8_vals(k));
+end

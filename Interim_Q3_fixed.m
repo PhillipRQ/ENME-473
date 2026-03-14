@@ -40,6 +40,10 @@ theta7_vals  = zeros(1, length(theta2_vals));
 Ax = zeros(1, length(theta2_vals));
 Ay = zeros(1, length(theta2_vals));
 
+% storage for angular velocities
+omegas = zeros(6, length(theta2_vals));
+omega2 = 1; % input angular velocity (rad/s)
+
 % loop through input values
 for k = 1:length(theta2_vals)
     theta2 = theta2_vals(k);
@@ -83,6 +87,23 @@ for k = 1:length(theta2_vals)
     theta36_vals(k) = x(4);
     theta8_vals(k)  = x(5);
     theta7_vals(k)  = x(6);
+
+    % velocity analysis: J * omega = -df/dtheta2 * omega2
+    theta23 = x(1); theta14 = x(2); theta46 = x(3);
+    theta36 = x(4); theta8  = x(5); theta7  = x(6);
+    J = [-R23*sin(theta23),  R14*sin(theta14),              0,                    0,             0,            0;
+          R23*cos(theta23), -R14*cos(theta14),              0,                    0,             0,            0;
+         -R4*sin(theta23),   R3*sin(theta14+alpha), -R46*sin(theta46),  R36*sin(theta36),       0,            0;
+          R4*cos(theta23),  -R3*cos(theta14+alpha),  R46*cos(theta46), -R36*cos(theta36),       0,            0;
+         -R4*sin(theta23),   R3*sin(theta14+alpha), -R6*sin(theta46),   R5*sin(theta36+beta),  R8*sin(theta8), -R7*sin(theta7);
+          R4*cos(theta23),  -R3*cos(theta14+alpha),  R6*cos(theta46),  -R5*cos(theta36+beta), -R8*cos(theta8),  R7*cos(theta7)];
+    df_dt2 = [-R2*sin(theta2);
+               R2*cos(theta2);
+              -R2*sin(theta2);
+               R2*cos(theta2);
+              -R2*sin(theta2);
+               R2*cos(theta2)];
+    omegas(:,k) = J \ (-df_dt2 * omega2);
 
     % compute Pin A position: Origin -> R2 -> R4 -> R6 -> (R8+RA) extension
     % theta4 = theta23, theta6 = theta46
@@ -161,4 +182,17 @@ fprintf('\n=== Pin A Position (mm) ===\n');
 fprintf('%10s %12s %12s\n', 'Theta 2', 'X_A', 'Y_A');
 for k = 1:length(in)
     fprintf('%10d %12.2f %12.2f\n', in(k), Ax(k), Ay(k));
+end
+
+%% Print tabular results (Q3b) - Angular Velocities
+% omegas rows: [t23, t14, t46, t36, t8, t7]
+% omega3 = omega14 (row 2), omega4 = omega23 (row 1), omega5 = omega36 (row 4),
+% omega6 = omega46 (row 3), omega7 = row 6, omega8 = row 5
+fprintf('\n=== Angular Velocities (rad/s) ===\n');
+fprintf('%10s %10s %10s %10s %10s %10s %10s\n', ...
+    'Theta 2', 'omega3', 'omega4', 'omega5', 'omega6', 'omega7', 'omega8');
+for k = 1:length(in)
+    fprintf('%10d %10.4f %10.4f %10.4f %10.4f %10.4f %10.4f\n', ...
+        in(k), omegas(2,k), omegas(1,k), omegas(4,k), ...
+        omegas(3,k), omegas(6,k), omegas(5,k));
 end
