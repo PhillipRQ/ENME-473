@@ -1,5 +1,5 @@
 % ENME 473 Project Deliverable 1 - Questions 3a & 3c
-clc; clear;
+clc; clear; close all;
 
 %% Known Values
 R1 = sqrt(237.2^2 + 70.6^2);
@@ -144,7 +144,7 @@ title('Link Angles vs Input Angle')
 legend('\theta_3','\theta_4','\theta_5','\theta_6','\theta_7','\theta_8','Location','best')
 grid on
 box on
-%exportgraphics(gcf, 'ENME_473_Project_3a.png', 'Resolution', 600);
+exportgraphics(gcf, 'ENME_473_Project_3a.png', 'Resolution', 600);
 
 %% Plot 2: Path Traced by Pin A (Q3c)
 figure
@@ -165,7 +165,7 @@ legend('Path of Pin A', '\theta_2 = 0°', '\theta_2 = 120°', 'Location', 'best'
 grid on
 box on
 axis equal
-%exportgraphics(gcf, 'ENME_473_Project_3c.png', 'Resolution', 600);
+exportgraphics(gcf, 'ENME_473_Project_3c.png', 'Resolution', 600);
 
 %% Write tables to Excel
 filename = 'Q3_Results.xlsx';
@@ -189,3 +189,30 @@ T_pinA = table(in', Ax', Ay', ...
 writetable(T_pinA, filename, 'Sheet', 'Pin A Position');
 
 fprintf('Q3 results written to %s\n', filename);
+
+%% Print summary tables for key angles
+idx = [1 31 61 91 121]; % theta2 = 0, 30, 60, 90, 120
+
+fprintf('\n=== Link Angles (degrees) ===\n');
+fprintf('%10s %10s %10s %10s %10s %10s %10s\n', ...
+    'Theta 2', 'Theta 3', 'Theta 4', 'Theta 5', 'Theta 6', 'Theta 7', 'Theta 8');
+for k = idx
+    fprintf('%10d %10.2f %10.2f %10.2f %10.2f %10.2f %10.2f\n', ...
+        in(k), theta3_vals(k), theta4_vals(k), theta5_vals(k), ...
+        theta6_vals(k), theta7_vals(k), theta8_vals(k));
+end
+
+fprintf('\n=== Angular Velocities (rad/s) ===\n');
+fprintf('%10s %10s %10s %10s %10s %10s %10s\n', ...
+    'Theta 2', 'omega3', 'omega4', 'omega5', 'omega6', 'omega7', 'omega8');
+for k = idx
+    fprintf('%10d %10.4f %10.4f %10.4f %10.4f %10.4f %10.4f\n', ...
+        in(k), omegas(2,k), omegas(1,k), omegas(4,k), ...
+        omegas(3,k), omegas(6,k), omegas(5,k));
+end
+
+fprintf('\n=== Pin A Position (mm) ===\n');
+fprintf('%10s %12s %12s\n', 'Theta 2', 'X_A', 'Y_A');
+for k = idx
+    fprintf('%10d %12.2f %12.2f\n', in(k), Ax(k), Ay(k));
+end

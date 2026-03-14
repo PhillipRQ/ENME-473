@@ -2,6 +2,7 @@
 % and generates the plots for Question 4
 clc; 
 clear;
+close all;
 
 %% Known Values
 R1 = sqrt(237.2^2 + 70.6^2);
@@ -152,7 +153,7 @@ title('Angular Velocities vs Input Angle (\omega_2 = 1 rad/s)')
 legend('\omega_3','\omega_4','\omega_5','\omega_6','\omega_7','\omega_8','Location','best')
 grid on
 box on
-%exportgraphics(gcf, 'ENME_473_Project_4a_velocity.png', 'Resolution', 600);
+exportgraphics(gcf, 'ENME_473_Project_4a_velocity.png', 'Resolution', 600);
 
 %% Plot 2: Angular Accelerations
 figure
@@ -169,7 +170,7 @@ title('Angular Accelerations vs Input Angle (\omega_2 = 1 rad/s, \alpha_2 = 0)')
 legend('\alpha_3','\alpha_4','\alpha_5','\alpha_6','\alpha_7','\alpha_8','Location','best')
 grid on
 box on
-%exportgraphics(gcf, 'ENME_473_Project_4a_acceleration.png', 'Resolution', 600);
+exportgraphics(gcf, 'ENME_473_Project_4a_acceleration.png', 'Resolution', 600);
 
 %% Write tables to Excel
 filename = 'Q4_Results.xlsx';
@@ -187,3 +188,24 @@ T_acc = table(in', alpha3_vals', alpha4_vals', alpha5_vals', ...
 writetable(T_acc, filename, 'Sheet', 'Angular Accelerations');
 
 fprintf('Q4 results written to %s\n', filename);
+
+%% Print summary tables for key angles
+idx = [1 31 61 91 121]; % theta2 = 0, 30, 60, 90, 120
+
+fprintf('\n=== Angular Velocities (rad/s) ===\n');
+fprintf('%10s %10s %10s %10s %10s %10s %10s\n', ...
+    'Theta 2', 'omega3', 'omega4', 'omega5', 'omega6', 'omega7', 'omega8');
+for k = idx
+    fprintf('%10d %10.4f %10.4f %10.4f %10.4f %10.4f %10.4f\n', ...
+        in(k), omega3_vals(k), omega4_vals(k), omega5_vals(k), ...
+        omega6_vals(k), omega7_vals(k), omega8_vals(k));
+end
+
+fprintf('\n=== Angular Accelerations (rad/s^2) ===\n');
+fprintf('%10s %10s %10s %10s %10s %10s %10s\n', ...
+    'Theta 2', 'alpha3', 'alpha4', 'alpha5', 'alpha6', 'alpha7', 'alpha8');
+for k = idx
+    fprintf('%10d %10.4f %10.4f %10.4f %10.4f %10.4f %10.4f\n', ...
+        in(k), alpha3_vals(k), alpha4_vals(k), alpha5_vals(k), ...
+        alpha6_vals(k), alpha7_vals(k), alpha8_vals(k));
+end
