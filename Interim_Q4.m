@@ -1,6 +1,6 @@
 % computes posture, velocity, and acceleration results
 % and generates the plots for Question 4
-clc; 
+clc;
 clear;
 close all;
 
@@ -17,6 +17,7 @@ R5 = 595.5;
 R6 = 378.9;
 R7 = 198.2;
 R8 = 254.4;
+RA = 336.9;         % distance from joint 7/8 to Pin A along link 8
 theta1 = deg2rad(180 - atand(70.6/237.2));
 alpha = deg2rad(3.2);
 beta = deg2rad(3.5);
@@ -51,6 +52,14 @@ alpha6_vals = zeros(1,length(theta2_vals));
 alpha7_vals = zeros(1,length(theta2_vals));
 alpha8_vals = zeros(1,length(theta2_vals));
 
+% Q4c: Pin A position, velocity, acceleration storage
+Ax = zeros(1,length(theta2_vals));
+Ay = zeros(1,length(theta2_vals));
+Ax_dot = zeros(1,length(theta2_vals));
+Ay_dot = zeros(1,length(theta2_vals));
+Ax_ddot = zeros(1,length(theta2_vals));
+Ay_ddot = zeros(1,length(theta2_vals));
+
 %% Main Loop: Posture, Velocity, Acceleration
 for k = 1:length(theta2_vals)
     theta2 = theta2_vals(k);
@@ -64,18 +73,18 @@ for k = 1:length(theta2_vals)
     % --- Posture (Newton-Raphson) ---
     while true
         f = [R2*cos(theta2) + R23*cos(theta23) - R14*cos(theta14) - R1*cos(theta1);
-             R2*sin(theta2) + R23*sin(theta23) - R14*sin(theta14) - R1*sin(theta1);
-             R2*cos(theta2) + R4*cos(theta23) + R46*cos(theta46) - R36*cos(theta36) - R3*cos(theta14+alpha) - R1*cos(theta1);
-             R2*sin(theta2) + R4*sin(theta23) + R46*sin(theta46) - R36*sin(theta36) - R3*sin(theta14+alpha) - R1*sin(theta1);
-             R2*cos(theta2) + R4*cos(theta23) + R6*cos(theta46) - R8*cos(theta8) + R7*cos(theta7) - R5*cos(theta36+beta) - R3*cos(theta14+alpha) - R1*cos(theta1);
-             R2*sin(theta2) + R4*sin(theta23) + R6*sin(theta46) - R8*sin(theta8) + R7*sin(theta7) - R5*sin(theta36+beta) - R3*sin(theta14+alpha) - R1*sin(theta1)];
+            R2*sin(theta2) + R23*sin(theta23) - R14*sin(theta14) - R1*sin(theta1);
+            R2*cos(theta2) + R4*cos(theta23) + R46*cos(theta46) - R36*cos(theta36) - R3*cos(theta14+alpha) - R1*cos(theta1);
+            R2*sin(theta2) + R4*sin(theta23) + R46*sin(theta46) - R36*sin(theta36) - R3*sin(theta14+alpha) - R1*sin(theta1);
+            R2*cos(theta2) + R4*cos(theta23) + R6*cos(theta46) - R8*cos(theta8) + R7*cos(theta7) - R5*cos(theta36+beta) - R3*cos(theta14+alpha) - R1*cos(theta1);
+            R2*sin(theta2) + R4*sin(theta23) + R6*sin(theta46) - R8*sin(theta8) + R7*sin(theta7) - R5*sin(theta36+beta) - R3*sin(theta14+alpha) - R1*sin(theta1)];
 
         J = [-R23*sin(theta23),  R14*sin(theta14),              0,              0,             0,            0;
-              R23*cos(theta23), -R14*cos(theta14),              0,              0,             0,            0;
-             -R4*sin(theta23),   R3*sin(theta14+alpha), -R46*sin(theta46),  R36*sin(theta36),  0,            0;
-              R4*cos(theta23),  -R3*cos(theta14+alpha),  R46*cos(theta46), -R36*cos(theta36),  0,            0;
-             -R4*sin(theta23),   R3*sin(theta14+alpha), -R6*sin(theta46),   R5*sin(theta36+beta),  R8*sin(theta8), -R7*sin(theta7);
-              R4*cos(theta23),  -R3*cos(theta14+alpha),  R6*cos(theta46),  -R5*cos(theta36+beta), -R8*cos(theta8),  R7*cos(theta7)];
+            R23*cos(theta23), -R14*cos(theta14),              0,              0,             0,            0;
+            -R4*sin(theta23),   R3*sin(theta14+alpha), -R46*sin(theta46),  R36*sin(theta36),  0,            0;
+            R4*cos(theta23),  -R3*cos(theta14+alpha),  R46*cos(theta46), -R36*cos(theta36),  0,            0;
+            -R4*sin(theta23),   R3*sin(theta14+alpha), -R6*sin(theta46),   R5*sin(theta36+beta),  R8*sin(theta8), -R7*sin(theta7);
+            R4*cos(theta23),  -R3*cos(theta14+alpha),  R6*cos(theta46),  -R5*cos(theta36+beta), -R8*cos(theta8),  R7*cos(theta7)];
 
         dx = J\f;
         x_new = x - dx;
@@ -100,11 +109,11 @@ for k = 1:length(theta2_vals)
 
     % --- Velocity ---
     b_vel = [R2*sin(theta2);
-            -R2*cos(theta2);
-             R2*sin(theta2);
-            -R2*cos(theta2);
-             R2*sin(theta2);
-            -R2*cos(theta2)] * omega2;
+        -R2*cos(theta2);
+        R2*sin(theta2);
+        -R2*cos(theta2);
+        R2*sin(theta2);
+        -R2*cos(theta2)] * omega2;
 
     omega_vec = J \ b_vel;
     % omega_vec = [w23; w14; w46; w36; w8; w7]
@@ -122,11 +131,11 @@ for k = 1:length(theta2_vals)
     w8  = omega_vec(5); w7  = omega_vec(6);
 
     rhs_acc = [R2*cos(theta2)*omega2^2 + R23*cos(theta23)*w23^2 - R14*cos(theta14)*w14^2;
-               R2*sin(theta2)*omega2^2 + R23*sin(theta23)*w23^2 - R14*sin(theta14)*w14^2;
-               R2*cos(theta2)*omega2^2 + R4*cos(theta23)*w23^2 + R46*cos(theta46)*w46^2 - R36*cos(theta36)*w36^2 - R3*cos(theta14+alpha)*w14^2;
-               R2*sin(theta2)*omega2^2 + R4*sin(theta23)*w23^2 + R46*sin(theta46)*w46^2 - R36*sin(theta36)*w36^2 - R3*sin(theta14+alpha)*w14^2;
-               R2*cos(theta2)*omega2^2 + R4*cos(theta23)*w23^2 + R6*cos(theta46)*w46^2 - R8*cos(theta8)*w8^2 + R7*cos(theta7)*w7^2 - R5*cos(theta36+beta)*w36^2 - R3*cos(theta14+alpha)*w14^2;
-               R2*sin(theta2)*omega2^2 + R4*sin(theta23)*w23^2 + R6*sin(theta46)*w46^2 - R8*sin(theta8)*w8^2 + R7*sin(theta7)*w7^2 - R5*sin(theta36+beta)*w36^2 - R3*sin(theta14+alpha)*w14^2];
+        R2*sin(theta2)*omega2^2 + R23*sin(theta23)*w23^2 - R14*sin(theta14)*w14^2;
+        R2*cos(theta2)*omega2^2 + R4*cos(theta23)*w23^2 + R46*cos(theta46)*w46^2 - R36*cos(theta36)*w36^2 - R3*cos(theta14+alpha)*w14^2;
+        R2*sin(theta2)*omega2^2 + R4*sin(theta23)*w23^2 + R46*sin(theta46)*w46^2 - R36*sin(theta36)*w36^2 - R3*sin(theta14+alpha)*w14^2;
+        R2*cos(theta2)*omega2^2 + R4*cos(theta23)*w23^2 + R6*cos(theta46)*w46^2 - R8*cos(theta8)*w8^2 + R7*cos(theta7)*w7^2 - R5*cos(theta36+beta)*w36^2 - R3*cos(theta14+alpha)*w14^2;
+        R2*sin(theta2)*omega2^2 + R4*sin(theta23)*w23^2 + R6*sin(theta46)*w46^2 - R8*sin(theta8)*w8^2 + R7*sin(theta7)*w7^2 - R5*sin(theta36+beta)*w36^2 - R3*sin(theta14+alpha)*w14^2];
 
     alpha_vec = J \ rhs_acc;
 
@@ -136,6 +145,28 @@ for k = 1:length(theta2_vals)
     alpha6_vals(k) = alpha_vec(3);
     alpha7_vals(k) = alpha_vec(6);
     alpha8_vals(k) = alpha_vec(5);
+
+    % --- Q4c: Pin A position, velocity, acceleration ---
+    a23 = alpha_vec(1);  a46 = alpha_vec(3);  a8 = alpha_vec(5);
+    RAtot = R8 + RA;
+
+    % Position
+    Ax(k) = R2*cos(theta2) + R4*cos(theta23) + R6*cos(theta46) - RAtot*cos(theta8);
+    Ay(k) = R2*sin(theta2) + R4*sin(theta23) + R6*sin(theta46) - RAtot*sin(theta8);
+
+    % Velocity (first derivative of position)
+    Ax_dot(k) = -R2*sin(theta2)*omega2 - R4*sin(theta23)*w23 - R6*sin(theta46)*w46 + RAtot*sin(theta8)*w8;
+    Ay_dot(k) =  R2*cos(theta2)*omega2 + R4*cos(theta23)*w23 + R6*cos(theta46)*w46 - RAtot*cos(theta8)*w8;
+
+    % Acceleration (second derivative of position, with alpha2 = 0)
+    Ax_ddot(k) = -R2*cos(theta2)*omega2^2 ...
+        - R4*cos(theta23)*w23^2 - R4*sin(theta23)*a23 ...
+        - R6*cos(theta46)*w46^2 - R6*sin(theta46)*a46 ...
+        + RAtot*cos(theta8)*w8^2 + RAtot*sin(theta8)*a8;
+    Ay_ddot(k) = -R2*sin(theta2)*omega2^2 ...
+        - R4*sin(theta23)*w23^2 + R4*cos(theta23)*a23 ...
+        - R6*sin(theta46)*w46^2 + R6*cos(theta46)*a46 ...
+        + RAtot*sin(theta8)*w8^2 - RAtot*cos(theta8)*a8;
 end
 
 %% Plot 1: Angular Velocities
@@ -208,4 +239,52 @@ for k = idx
     fprintf('%10d %10.4f %10.4f %10.4f %10.4f %10.4f %10.4f\n', ...
         in(k), alpha3_vals(k), alpha4_vals(k), alpha5_vals(k), ...
         alpha6_vals(k), alpha7_vals(k), alpha8_vals(k));
+end
+
+%% Q4c: Pin A Plots
+
+% Plot 3: Pin A Horizontal and Vertical Acceleration
+figure
+plot(in, Ax_ddot, 'LineWidth', 2)
+hold on
+plot(in, Ay_ddot, 'LineWidth', 2)
+xlabel('\theta_2 (deg)')
+ylabel('Acceleration (mm/s^2)')
+title('Pin A Linear Acceleration vs Input Angle (\omega_2 = 1 rad/s, \alpha_2 = 0)')
+legend('a_{Ax} (horizontal)', 'a_{Ay} (vertical)', 'Location', 'best')
+grid on
+box on
+exportgraphics(gcf, 'ENME_473_Project_4c_acceleration.png', 'Resolution', 600);
+
+% Plot 4: Pin A Horizontal and Vertical Velocity
+figure
+plot(in, Ax_dot, 'LineWidth', 2)
+hold on
+plot(in, Ay_dot, 'LineWidth', 2)
+xlabel('\theta_2 (deg)')
+ylabel('Velocity (mm/s)')
+title('Pin A Linear Velocity vs Input Angle (\omega_2 = 1 rad/s)')
+legend('v_{Ax} (horizontal)', 'v_{Ay} (vertical)', 'Location', 'best')
+grid on
+box on
+exportgraphics(gcf, 'ENME_473_Project_4c_velocity.png', 'Resolution', 600);
+
+%% Q4c: Pin A Tables
+
+% Write to Excel
+T_pinA = table(in', Ax', Ay', Ax_dot', Ay_dot', Ax_ddot', Ay_ddot', ...
+    'VariableNames', {'Theta2_deg','X_A_mm','Y_A_mm','Vx_A_mm_s','Vy_A_mm_s','Ax_A_mm_s2','Ay_A_mm_s2'});
+writetable(T_pinA, filename, 'Sheet', 'Pin A');
+
+% Print summary
+fprintf('\n=== Pin A Velocity (mm/s) ===\n');
+fprintf('%10s %12s %12s\n', 'Theta 2', 'Vx_A', 'Vy_A');
+for k = idx
+    fprintf('%10d %12.4f %12.4f\n', in(k), Ax_dot(k), Ay_dot(k));
+end
+
+fprintf('\n=== Pin A Acceleration (mm/s^2) ===\n');
+fprintf('%10s %12s %12s\n', 'Theta 2', 'Ax_A', 'Ay_A');
+for k = idx
+    fprintf('%10d %12.4f %12.4f\n', in(k), Ax_ddot(k), Ay_ddot(k));
 end
